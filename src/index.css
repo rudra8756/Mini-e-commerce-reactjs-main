@@ -1,0 +1,84 @@
+@import "tailwindcss";
+*{
+    box-sizing: border-box;
+}
+body{
+    overflow-x: hidden;
+}
+.button{
+    width: 280px;
+    align-items: center;
+    margin-left: 790px;
+    /* padding: 5px; */
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+    
+    justify-items: center;
+}
+
+.button1{
+    cursor: pointer;
+ 
+    border: 2px solid #1d1c1c;
+padding: 3px;
+    align-items: center;
+    
+}
+/* .dropdown-menu{
+    border-radius: 5px;
+    position: absolute;
+    margin-left: -250px;
+    z-index: 99;
+} */
+.left{
+    width:240px;
+    border: 0px solid #d52f2f;
+
+}
+.left ul li{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mid-part{
+    display: flex;
+    border: 0px solid #2a24ce;
+    gap:20px;
+    margin-top: 10px;
+}
+.prt-1{
+    border: 0px solid #24ce32;
+    display: flex;
+    gap:20px;
+
+    flex-wrap: wrap;
+}
+.icon{
+    width: 10px;
+    font-weight:normal;
+    font-size: 12px;
+    text-align: center;
+    padding: 0px;
+    color: #313331;
+}
+.plus{
+    color: #1d1c1c;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    
+}
+.minus{
+    color: #1d1c1c;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.cart{
+    text-align: center;
+    font-size: 17px;
+    font: weight 300%;
+padding: 20px;
+margin-top: 50px;
+}
