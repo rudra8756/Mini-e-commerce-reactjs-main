@@ -20,6 +20,11 @@ app.use(cors({
 
 app.use(express.json());
 
+// ✅ Root Route (Add This)
+app.get("/", (req, res) => {
+  res.send("Mini Ecommerce API is Running 🚀");
+});
+
 app.use("/api/products", require("./routes/product"));
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/cart", require("./routes/cart"));
