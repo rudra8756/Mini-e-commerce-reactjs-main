@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import Register from './pages/Register.jsx'
 import Product from './pages/Product.jsx'
+import Dashboard from './pages/Dashboard.jsx'
 import MainContext from './MainContext.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')).render(
         <Route path='/Product' element={<Product />} />
         <Route path='/Login' element={<Login />} />
         <Route path='/Register' element={<Register />} />
+        <Route path='/Dashboard' element={<Dashboard />} />
       </Routes>
 
     </BrowserRouter>
