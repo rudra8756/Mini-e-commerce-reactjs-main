@@ -7,7 +7,10 @@ const productSchema = new mongoose.Schema({
   brand: String,
   rating: Number,
   discountPercentage: Number,
-  thumbnail: String
+  thumbnail: String,
+  images: [String],
+  description: String,
+  stock: Number
 });
 
 module.exports = mongoose.model("Product", productSchema);

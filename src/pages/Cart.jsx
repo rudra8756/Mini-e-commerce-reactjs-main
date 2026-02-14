@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Header from '../common/Header'
-import { cartContext } from '../MainContext'
+import { userContext } from '../MainContext'
 import { IoAdd } from "react-icons/io5";
 import { FiMinus } from "react-icons/fi";
 import { ToastContainer, toast } from 'react-toastify';
@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import API from '../api';
   
 export default function Cart() {
-    let { cart, setcart } = useContext(cartContext)
+    let { cart, setcart } = useContext(userContext)
     const [discountApplied, setDiscountApplied] = useState(false)
     const [cartData, setCartData] = useState(null)
 
@@ -170,7 +170,7 @@ export default function Cart() {
 }
 
 function CartRow({ data, discountApplied, discountPercentage, refreshCart }) {
-    let { cart, setcart } = useContext(cartContext)
+    let { cart, setcart } = useContext(userContext)
     let { quantity } = data
     let [myqty, setqty] = useState(quantity)
 

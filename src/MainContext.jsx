@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react'
-export let cartContext = createContext()
+export let userContext = createContext()
 
 export default function MainContext({ children }) {
     let [user, setuser] = useState(localStorage.getItem("USER") ? JSON.parse(localStorage.getItem("USER")) : null)
@@ -33,7 +33,7 @@ export default function MainContext({ children }) {
         localStorage.setItem("USER", JSON.stringify(user))
     }, [token])
     return (
-        <cartContext.Provider value={obj}>{children}</cartContext.Provider>
+        <userContext.Provider value={obj}>{children}</userContext.Provider>
 
     )
 }

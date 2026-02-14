@@ -3,11 +3,11 @@ import Header from '../common/Header'
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import { app } from '../FirebaseConfig';
-import { cartContext } from '../MainContext';
+import { userContext } from '../MainContext';
 import { useNavigate } from 'react-router';
 export default function Login() {
    let navitage = useNavigate()
-   let { user, setuser, token, settoken } = useContext(cartContext)
+   let { user, setuser, token, settoken } = useContext(userContext)
    const provider = new GoogleAuthProvider();
    const auth = getAuth(app);
    let googlewithlogin = () => {

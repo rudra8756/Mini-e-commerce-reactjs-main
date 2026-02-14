@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
 import { Link } from 'react-router'
-import { cartContext } from '../MainContext'
+import { userContext } from '../MainContext'
 
 export default function Header() {
-   let { cart } = useContext(cartContext)
-   let { token, settoken, user, setuser } = useContext(cartContext)
+   let { cart } = useContext(userContext)
+   let { token, settoken, user, setuser } = useContext(userContext)
    // console.log(obj)
    return (
       <div className=" sticky top-0 z-[999] shadow-lg ">

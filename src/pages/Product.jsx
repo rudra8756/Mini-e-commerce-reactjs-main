@@ -4,7 +4,7 @@ import Footer from '../common/Footer';
 import API from '../api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { cartContext } from '../MainContext';
+import { userContext } from '../MainContext';
 
 export default function Product() {
 
@@ -17,7 +17,7 @@ export default function Product() {
     const [priceRange, setPriceRange] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
 
-    const { cart, setcart } = useContext(cartContext);
+    const { cart, setcart } = useContext(userContext);
 
     const Toggle = () => setIsOpen(!isOpen);
 

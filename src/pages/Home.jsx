@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Header from '../common/Header'
 import Footer from '../common/Footer'
-import { cartContext } from '../MainContext'
+import { userContext } from '../MainContext'
 import API from '../api'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 
 export default function Home() {
-  let { cart, setcart } = useContext(cartContext)
+  let { cart, setcart } = useContext(userContext)
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
