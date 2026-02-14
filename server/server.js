@@ -11,10 +11,13 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://mini-e-commerce-reactjs-main-jw088qi4v.vercel.app"
-  ],
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if(!origin) return callback(null, true);
+    
+    // Allow all origins in development and production
+    return callback(null, true);
+  },
   credentials: true
 }));
 
