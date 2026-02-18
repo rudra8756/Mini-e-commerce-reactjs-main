@@ -13,7 +13,16 @@ export default function Home() {
 
   useEffect(() => {
     API.get("/products")
-      .then(res => setProducts(res.data.products))
+      .then(res => {
+        if (res.data && res.data.products) {
+          setProducts(res.data.products);
+        } else {
+          console.error("Products not found in response:", res.data);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching products:", err);
+      });
   }, []);
 
   const addToCart = async (product) => {

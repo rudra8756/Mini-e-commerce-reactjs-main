@@ -33,6 +33,11 @@ export default function Product() {
     const getProducts = () => {
         API.get("/products")
             .then((res) => {
+                if (!res.data || !res.data.products) {
+                    console.error("Products not found in response:", res.data);
+                    setProducts([]);
+                    return;
+                }
 
                 let filtered = res.data.products;
 
