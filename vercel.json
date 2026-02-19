@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://mini-e-commerce-reactjs-main.onrender.com/api/$1" },
+    { "source": "/products", "destination": "https://mini-e-commerce-reactjs-main.onrender.com/products" },
+    { "source": "/auth/(.*)", "destination": "https://mini-e-commerce-reactjs-main.onrender.com/auth/$1" },
+    { "source": "/cart/(.*)", "destination": "https://mini-e-commerce-reactjs-main.onrender.com/cart/$1" },
+    { "source": "/orders/(.*)", "destination": "https://mini-e-commerce-reactjs-main.onrender.com/orders/$1" },
+    { "source": "/wishlist/(.*)", "destination": "https://mini-e-commerce-reactjs-main.onrender.com/wishlist/$1" }
+  ]
+}

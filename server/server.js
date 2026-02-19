@@ -28,6 +28,17 @@ app.get("/", (req, res) => {
   res.send("Mini Ecommerce API is Running 🚀");
 });
 
+// ✅ Handle non-/api routes for frontend compatibility
+// These are needed because on deployment, VITE_API_BASE_URL might be set
+// causing requests like GET https://domain.com/products instead of 
+// GET https://domain.com/api/products
+app.use("/products", require("./routes/product"));
+app.use("/auth", require("./routes/auth"));
+app.use("/cart", require("./routes/cart"));
+app.use("/orders", require("./routes/order"));
+app.use("/wishlist", require("./routes/wishlist"));
+
+// Original /api routes
 app.use("/api/products", require("./routes/product"));
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/cart", require("./routes/cart"));

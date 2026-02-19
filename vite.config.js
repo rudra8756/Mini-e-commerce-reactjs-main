@@ -10,7 +10,43 @@ export default defineConfig({
   },
   server: {
     fs: {
-      allow: ['..']
+      allow: ['.']
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/products': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/auth': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/cart': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/orders': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/wishlist': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      }
+    }
+  },
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
+  },
+  build: {
+    rollupOptions: {
+      external: ['mongoose', 'express', 'cors', 'dotenv', 'bcryptjs', 'jsonwebtoken', 'stripe']
     }
   }
 })
