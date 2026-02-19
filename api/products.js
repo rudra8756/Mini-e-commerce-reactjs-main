@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+ import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
   id: Number,
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   try {
     // Connect to MongoDB if not already connected
     if (mongoose.connection.readyState === 0) {
-      await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/ecommerce');
+      await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://ecommerceUser:Ecommerce%40123@ecommerce-cluster.m7wi9ys.mongodb.net/ecommerce?retryWrites=true&w=majority');
     }
 
     // Get all products
