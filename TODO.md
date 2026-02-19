@@ -1,23 +1,27 @@
-# TODO: Deploy Backend to Vercel API Routes
+# TODO: E-commerce Features Implementation
 
-## Progress Tracker
-- [x] Create Vercel API routes directory structure
-- [x] Create /api/products route
-- [x] Create /api/auth route (register, login)
-- [x] Create /api/cart route
-- [x] Create /api/orders route
-- [x] Create /api/wishlist route
-- [x] Create /api/payment route
-- [x] Update MongoDB connection for serverless
-- [x] Update src/api.js to use relative paths
-- [x] Add backend dependencies to package.json
-- [x] Create .env.example file
+## Current Issues to Fix:
+1. ✅ Products 404 error - FIXED
+2. ❌ User Registration not working
+3. ❌ Address input in Cart (hardcoded)
+4. ❌ Payment integration (hardcoded to COD)
+5. ❌ Product reviews (not implemented)
 
-## Next Steps
-1. Deploy to Vercel
-2. Set the following environment variables in Vercel:
-   - MONGO_URI: Your MongoDB connection string
-   - JWT_SECRET: Your JWT secret key
-   - STRIPE_SECRET_KEY: Your Stripe secret key (optional)
-3. Seed products in the MongoDB database
-4. Test the deployment
+## Implementation Plan:
+
+### Phase 1: Fix User Registration
+- [ ] Check backend error handling
+- [ ] Improve frontend error display
+
+### Phase 2: Add Address Input in Cart
+- [ ] Add form fields for shipping address
+- [ ] Make address fields editable
+
+### Phase 3: Add Payment Integration
+- [ ] Add payment method selection (COD, Card, UPI)
+- [ ] Add payment form for online payments
+
+### Phase 4: Add Product Reviews
+- [ ] Add review model to backend
+- [ ] Add review API endpoints
+- [ ] Add review UI to Product page

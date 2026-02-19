@@ -11,11 +11,23 @@ export default function Cart() {
     let { cart, setcart } = useContext(userContext)
     const [discountApplied, setDiscountApplied] = useState(false)
     const [cartData, setCartData] = useState(null)
+    
+    // Address form state
+    const [shippingAddress, setShippingAddress] = useState({
+        name: "",
+        address: "",
+        city: "",
+        state: "",
+        pincode: "",
+        phone: ""
+    })
+    
+    // Payment method state
+    const [paymentMethod, setPaymentMethod] = useState("cod")
 
     const refreshCart = () => {
         API.get("/cart").then(res => {
             setCartData(res.data);
-            // Update global cart context to sync with server data
             setcart(res.data.products || []);
         }).catch(err => console.log(err));
     };
@@ -28,7 +40,6 @@ export default function Cart() {
 
     const validCart = (cartData?.products || []).filter(item => item.product);
 
-    // Cart Total Function
     const getTotal = () => {
         return validCart.reduce(
             (total, item) => total + (item.product?.price || 0) * (item.quantity || 0),
@@ -36,18 +47,17 @@ export default function Cart() {
         );
     };
 
-    // Discount logic based on order value
     const getDiscountPercentage = (totalPrice) => {
-        if (totalPrice >= 1000) return 15 // 15% discount for orders above Rs. 1000
-        if (totalPrice >= 500) return 10  // 10% discount for orders above Rs. 500
-        if (totalPrice >= 200) return 5   // 5% discount for orders above Rs. 200
+        if (totalPrice >= 1000) return 15
+        if (totalPrice >= 500) return 10
+        if (totalPrice >= 200) return 5
         return 0
     }
 
     const totalPrice = validCart.reduce((total, item) => total + (Number(item.quantity || 1) * Number(item.product?.price || 0)), 0)
     const discountPercentage = getDiscountPercentage(totalPrice)
     const discountAmount = discountApplied ? (totalPrice * discountPercentage / 100) : 0
-    const shippingCost = totalPrice > 500 ? 0 : 100 // Free shipping for orders above Rs. 500
+    const shippingCost = totalPrice > 500 ? 0 : 100
     const finalTotal = totalPrice - discountAmount + shippingCost
 
     const handleApplyDiscount = () => {
@@ -60,24 +70,41 @@ export default function Cart() {
     }
 
     const handleCheckout = async () => {
+        // Validate address
+        if (!shippingAddress.name || !shippingAddress.address || !shippingAddress.city || !shippingAddress.pincode || !shippingAddress.phone) {
+            toast.error("Please fill in all address fields");
+            return;
+        }
+        
+        // Validate phone (10 digits)
+        if (!/^\d{10}$/.test(shippingAddress.phone)) {
+            toast.error("Please enter a valid 10-digit phone number");
+            return;
+        }
+
         try {
             const orderData = {
-                shippingAddress: {
-                    name: "Guest User",
-                    address: "Demo Address",
-                    city: "Demo City",
-                    state: "Demo State",
-                    pincode: "123456",
-                    phone: "9876543210"
-                },
-                paymentMethod: "cod"
+                shippingAddress: shippingAddress,
+                paymentMethod: paymentMethod
             };
 
             const response = await API.post("/orders", orderData);
             toast.success("Order placed successfully!");
-            refreshCart(); // Refresh cart after order
+            
+            // Clear form after successful order
+            setShippingAddress({
+                name: "",
+                address: "",
+                city: "",
+                state: "",
+                pincode: "",
+                phone: ""
+            });
+            setPaymentMethod("cod");
+            
+            refreshCart();
         } catch (error) {
-            toast.error("Failed to place order");
+            toast.error("Failed to place order: " + (error.response?.data?.message || error.message));
         }
     }
 
@@ -150,6 +177,135 @@ export default function Cart() {
                             Apply Discount
                         </button>
 
+                        {/* Shipping Address Section */}
+                        <div className="border-t mt-6 pt-4">
+                            <h3 className="font-semibold text-lg mb-4">Shipping Address</h3>
+                            
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-xs uppercase font-semibold">Full Name</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Enter your full name"
+                                        className="w-full p-2 border text-sm"
+                                        value={shippingAddress.name}
+                                        onChange={(e) => setShippingAddress({...shippingAddress, name: e.target.value})}
+                                        required
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label className="text-xs uppercase font-semibold">Address</label>
+                                    <textarea 
+                                        placeholder="Enter your full address"
+                                        className="w-full p-2 border text-sm"
+                                        rows="2"
+                                        value={shippingAddress.address}
+                                        onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
+                                        required
+                                    />
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="text-xs uppercase font-semibold">City</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="City"
+                                            className="w-full p-2 border text-sm"
+                                            value={shippingAddress.city}
+                                            onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs uppercase font-semibold">State</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="State"
+                                            className="w-full p-2 border text-sm"
+                                            value={shippingAddress.state}
+                                            onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="text-xs uppercase font-semibold">Pincode</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="6-digit pincode"
+                                            className="w-full p-2 border text-sm"
+                                            value={shippingAddress.pincode}
+                                            onChange={(e) => setShippingAddress({...shippingAddress, pincode: e.target.value})}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs uppercase font-semibold">Phone</label>
+                                        <input 
+                                            type="tel" 
+                                            placeholder="10-digit phone"
+                                            className="w-full p-2 border text-sm"
+                                            value={shippingAddress.phone}
+                                            onChange={(e) => setShippingAddress({...shippingAddress, phone: e.target.value})}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Payment Method Section */}
+                        <div className="border-t mt-6 pt-4">
+                            <h3 className="font-semibold text-lg mb-4">Payment Method</h3>
+                            
+                            <div className="space-y-2">
+                                <label className="flex items-center space-x-2 cursor-pointer">
+                                    <input 
+                                        type="radio" 
+                                        name="payment" 
+                                        value="cod"
+                                        checked={paymentMethod === "cod"}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-sm">Cash on Delivery (COD)</span>
+                                </label>
+                                
+                                <label className="flex items-center space-x-2 cursor-pointer">
+                                    <input 
+                                        type="radio" 
+                                        name="payment" 
+                                        value="card"
+                                        checked={paymentMethod === "card"}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-sm">Credit/Debit Card</span>
+                                </label>
+                                
+                                <label className="flex items-center space-x-2 cursor-pointer">
+                                    <input 
+                                        type="radio" 
+                                        name="payment" 
+                                        value="upi"
+                                        checked={paymentMethod === "upi"}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-sm">UPI</span>
+                                </label>
+                            </div>
+                            
+                            {paymentMethod !== "cod" && (
+                                <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
+                                    <p>Payment will be processed securely. You will receive payment details after placing the order.</p>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="border-t mt-8">
                             <div className="flex font-semibold justify-between py-6 text-sm uppercase">
                                 <span>Total cost</span>
@@ -159,7 +315,7 @@ export default function Cart() {
                                 onClick={handleCheckout}
                                 className="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full cursor-pointer"
                             >
-                                Checkout
+                                Place Order
                             </button>
                         </div>
                     </div>
@@ -177,7 +333,6 @@ function CartRow({ data, discountApplied, discountPercentage, refreshCart }) {
     const removeFromCart = async () => {
         try {
             await API.delete(`/cart/${data.product._id}`);
-            // Refresh cart data
             refreshCart();
             toast.success("Item removed from cart");
         } catch (error) {
@@ -195,7 +350,6 @@ function CartRow({ data, discountApplied, discountPercentage, refreshCart }) {
     };
 
     useEffect(() => {
-        // Update quantity on backend when local state changes
         if (myqty !== quantity) {
             updateQuantity(myqty);
         }
