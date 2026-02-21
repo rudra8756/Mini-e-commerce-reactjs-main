@@ -7,11 +7,18 @@ const Product = require("../models/Product");
 // ================= PLACE ORDER =================
 exports.placeOrder = async (req, res) => {
   try {
-    const userId = "guest"; // For demo purposes
-    const { shippingAddress, paymentMethod = "cod" } = req.body;
+    const userId = req.body.userId || "guest";
+    const { 
+      shippingAddress, 
+      paymentMethod = "cod",
+      userId: reqUserId 
+    } = req.body;
+
+    // Use authenticated user ID if available
+    const finalUserId = reqUserId || userId;
 
     // Get user's cart
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ userId: finalUserId });
     if (!cart) {
       return res.status(400).json({ message: "Cart is empty" });
     }
@@ -22,7 +29,7 @@ exports.placeOrder = async (req, res) => {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
-    // Calculate totals
+    // Calculate totals and prepare items
     let totalAmount = 0;
     const orderItems = [];
 
@@ -34,36 +41,36 @@ exports.placeOrder = async (req, res) => {
       totalAmount += price * quantity;
       orderItems.push({
         productId: product._id,
-        quantity,
-        price
+        title: product.title,
+        price: price,
+        quantity: quantity,
+        thumbnail: product.thumbnail
       });
     }
 
-    // Create order
+    // Create order with all details including shipping address
     const order = new Order({
-      userId,
-      totalAmount
+      userId: finalUserId,
+      items: orderItems,
+      totalAmount: totalAmount,
+      shippingAddress: shippingAddress || {},
+      paymentMethod: paymentMethod,
+      paymentStatus: paymentMethod === "cod" ? "pending" : "pending"
     });
 
     await order.save();
 
-    // Create order items
-    for (const item of orderItems) {
-      const orderItem = new OrderItem({
-        orderId: order._id,
-        ...item
-      });
-      await orderItem.save();
-    }
-
     // Clear cart after order placement
     await CartItem.deleteMany({ cartId: cart._id });
 
-    // Populate order with items
-    const populatedOrder = await Order.findById(order._id);
-    const orderItemsPopulated = await OrderItem.find({ orderId: order._id }).populate("productId");
-    res.json({ ...populatedOrder.toObject(), products: orderItemsPopulated.map(item => ({ product: item.productId, quantity: item.quantity, price: item.price })) });
+    // Return the complete order with estimated delivery
+    res.json({
+      success: true,
+      order: order,
+      message: paymentMethod === "cod" ? "Order placed successfully! You will pay on delivery." : "Order placed successfully!"
+    });
   } catch (error) {
+    console.error("Place order error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -71,15 +78,10 @@ exports.placeOrder = async (req, res) => {
 // ================= GET USER ORDERS =================
 exports.getUserOrders = async (req, res) => {
   try {
-    const userId = "guest"; // For demo purposes
+    const userId = req.query.userId || "guest";
     const orders = await Order.find({ userId }).sort({ createdAt: -1 });
 
-    const ordersWithItems = await Promise.all(orders.map(async (order) => {
-      const orderItems = await OrderItem.find({ orderId: order._id }).populate("productId");
-      return { ...order.toObject(), products: orderItems.map(item => ({ product: item.productId, quantity: item.quantity, price: item.price })) };
-    }));
-
-    res.json(ordersWithItems);
+    res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -93,8 +95,7 @@ exports.getOrderById = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    const orderItems = await OrderItem.find({ orderId: order._id }).populate("productId");
-    res.json({ ...order.toObject(), products: orderItems.map(item => ({ product: item.productId, quantity: item.quantity, price: item.price })) });
+    res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -103,19 +104,55 @@ exports.getOrderById = async (req, res) => {
 // ================= UPDATE ORDER STATUS =================
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { orderStatus } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { orderStatus },
-      { new: true }
-    );
+    const { orderStatus, description } = req.body;
+    const order = await Order.findById(req.params.id);
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    const orderItems = await OrderItem.find({ orderId: order._id }).populate("productId");
-    res.json({ ...order.toObject(), products: orderItems.map(item => ({ product: item.productId, quantity: item.quantity, price: item.price })) });
+    // Update order status
+    order.orderStatus = orderStatus;
+    
+    // Add to status timeline
+    order.statusTimeline.push({
+      status: orderStatus,
+      timestamp: new Date(),
+      description: description || `Order status updated to ${orderStatus}`
+    });
+
+    await order.save();
+
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ================= CONFIRM PAYMENT =================
+exports.confirmPayment = async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.paymentStatus = paymentStatus;
+    
+    if (paymentStatus === "paid") {
+      order.statusTimeline.push({
+        status: "confirmed",
+        timestamp: new Date(),
+        description: "Payment confirmed, order confirmed"
+      });
+      order.orderStatus = "confirmed";
+    }
+
+    await order.save();
+
+    res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
