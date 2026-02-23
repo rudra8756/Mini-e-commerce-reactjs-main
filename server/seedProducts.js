@@ -451,10 +451,18 @@ const getThumbnail = (title) => {
   }
   const baseTitle = words.join(' ');
   
+  // First check if exact title exists
+  if (productImageMap[title]) {
+    return productImageMap[title];
+  }
+  
+  // Then check if base title exists
   if (productImageMap[baseTitle]) {
     return productImageMap[baseTitle];
   }
-  return getFallbackImage(baseTitle);
+  
+  // Use fallback but with product name to get consistent images
+  return getFallbackImage(title);
 };
 
 // Generate products with variations

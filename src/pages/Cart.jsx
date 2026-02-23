@@ -84,7 +84,15 @@ export default function Cart() {
 
         try {
             const orderData = {
-                shippingAddress: shippingAddress,
+                shippingAddress: {
+                    name: shippingAddress.name,
+                    phone: shippingAddress.phone,
+                    street: shippingAddress.address,
+                    city: shippingAddress.city,
+                    state: shippingAddress.state,
+                    zipCode: shippingAddress.pincode,
+                    country: "India"
+                },
                 paymentMethod: paymentMethod
             };
 
