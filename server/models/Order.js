@@ -58,7 +58,7 @@ const orderSchema = new mongoose.Schema(
 );
 
 // Calculate estimated delivery before saving
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', async function() {
   if (!this.estimatedDelivery) {
     // Calculate delivery date based on location (3-7 days)
     const city = this.shippingAddress?.city?.toLowerCase() || '';
@@ -87,8 +87,6 @@ orderSchema.pre('save', function(next) {
       description: "Order placed successfully"
     }];
   }
-  
-  next();
 });
 
 module.exports = mongoose.model("Order", orderSchema);
