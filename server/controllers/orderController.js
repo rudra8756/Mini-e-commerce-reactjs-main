@@ -17,8 +17,14 @@ exports.placeOrder = async (req, res) => {
     // Use authenticated user ID if available
     const finalUserId = reqUserId || userId;
 
-    // Get user's cart
-    const cart = await Cart.findOne({ userId: finalUserId });
+    // Get user's cart - also check guest cart if user is logged in
+    let cart = await Cart.findOne({ userId: finalUserId });
+    
+    // If user is logged in but has no cart, check guest cart
+    if (!cart && finalUserId !== "guest") {
+      cart = await Cart.findOne({ userId: "guest" });
+    }
+    
     if (!cart) {
       return res.status(400).json({ message: "Cart is empty" });
     }
