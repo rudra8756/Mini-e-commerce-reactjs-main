@@ -24,7 +24,8 @@ export default function Cart() {
     const [paymentMethod, setPaymentMethod] = useState("cod")
 
     const refreshCart = () => {
-        API.get("/cart").then(res => {
+        const userId = user?._id || localStorage.getItem("USER_ID");
+        API.get(`/cart?userId=${userId}`).then(res => {
             setCartData(res.data);
             setcart(res.data.products || []);
         }).catch(err => console.log(err));

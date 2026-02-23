@@ -25,9 +25,14 @@ export default function Login() {
          });
          
          if (response.data.token && response.data.user) {
+            // Store for compatibility
             localStorage.setItem("USER_TOKEN", response.data.token)
             localStorage.setItem("USER_ID", response.data.user._id)
             localStorage.setItem("USER_NAME", response.data.user.name)
+            // Store for MainContext
+            localStorage.setItem("TOKEN", response.data.token)
+            localStorage.setItem("USER", JSON.stringify(response.data.user))
+            
             setuser(response.data.user)
             alert("Login Successful!")
             navigate('/')

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { Link } from 'react-router'
 import Header from '../common/Header'
 import Footer from '../common/Footer'
 import { userContext } from '../MainContext'
@@ -7,9 +8,10 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 export default function Home() {
-  let { cart, setcart } = useContext(userContext)
+  let { cart, setcart, user } = useContext(userContext)
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [previousOrders, setPreviousOrders] = useState([]);
 
   useEffect(() => {
     API.get("/products")
@@ -26,13 +28,31 @@ export default function Home() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+
+    // Fetch previous orders for Buy Again section
+    if (user || localStorage.getItem("USER_ID")) {
+      const userId = user?.uid || user?._id || localStorage.getItem("USER_ID");
+      if (userId) {
+        API.get(`/orders?userId=${userId}`)
+          .then(res => {
+            if (res.data && res.data.orders) {
+              setPreviousOrders(res.data.orders);
+            } else if (Array.isArray(res.data)) {
+              setPreviousOrders(res.data);
+            }
+          })
+          .catch(err => console.error("Error fetching orders:", err));
+      }
+    }
+  }, [user]);
 
   const addToCart = async (product) => {
     try {
+      const userId = user?._id || localStorage.getItem("USER_ID");
       await API.post("/cart", {
         productId: product._id,
-        quantity: 1
+        quantity: 1,
+        userId: userId
       });
       setcart(prev => [...prev, { productId: product, quantity: 1 }]);
       toast.success("Added to cart");
@@ -40,6 +60,13 @@ export default function Home() {
       toast.error("Failed to add to cart");
     }
   };
+
+  // Get unique products from previous orders for Buy Again
+  const buyAgainProducts = previousOrders.flatMap(order => 
+    order.items?.map(item => item.product || item.productId).filter(Boolean)
+  ).filter((product, index, self) => 
+    index === self.findIndex(p => p._id === product._id)
+  ).slice(0, 5);
 
   if (loading) {
     return (
@@ -82,6 +109,36 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Buy Again Section - Only show if user has previous orders */}
+      {buyAgainProducts.length > 0 && (
+        <section className="py-8 bg-orange-50">
+          <div className="max-w-screen-xl mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              🔄 Buy Again
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {buyAgainProducts.map((product) => (
+                <div key={product._id} className="bg-white rounded-lg shadow-md p-3 hover:shadow-xl transition-shadow">
+                  <img
+                    src={product.thumbnail || product.image || 'https://via.placeholder.com/150'}
+                    alt={product.title}
+                    className="w-full h-32 object-cover rounded mb-2"
+                  />
+                  <p className="font-semibold text-sm truncate">{product.title}</p>
+                  <p className="text-orange-500 font-bold">₹{product.price}</p>
+                  <button
+                    onClick={() => addToCart(product)}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm py-1 mt-2 rounded"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Categories */}
       <section className="py-12 bg-gray-100">
