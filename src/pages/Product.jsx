@@ -288,38 +288,67 @@ export default function Product() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 p-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
                 {products.map((item) => (
-                    <div key={item._id} className="shadow-lg w-60 p-3">
-                        <img
-                            src={item.thumbnail}
-                            alt={item.title}
-                            className="w-full h-40 object-cover"
-                            onError={(e) => e.target.src = 'https://picsum.photos/150'}
-                        />
+                    <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                        <div className="relative">
+                            <img
+                                src={item.thumbnail}
+                                alt={item.title}
+                                className="w-full h-48 object-cover"
+                                onError={(e) => e.target.src = 'https://picsum.photos/300/300'}
+                            />
+                            {item.discountPercentage > 0 && (
+                                <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                    {item.discountPercentage}% OFF
+                                </span>
+                            )}
+                        </div>
+                        
+                        <div className="p-3">
+                            <h3 className="font-medium text-sm text-gray-800 line-clamp-2 h-10">{item.title}</h3>
+                            
+                            <div className="flex items-center mt-1">
+                                <span className="text-yellow-500 text-sm">⭐ {item.rating}</span>
+                                <span className="text-gray-500 text-xs ml-1">({item.reviewCount || 0})</span>
+                            </div>
+                            
+                            <div className="flex items-baseline gap-2 mt-1">
+                                <span className="text-lg font-bold text-gray-900">₹{item.discountedPrice || item.price}</span>
+                                {item.discountedPrice && (
+                                    <span className="text-sm text-gray-500 line-through">₹{item.price}</span>
+                                )}
+                            </div>
+                            
+                            {item.freeDelivery && (
+                                <p className="text-green-600 text-xs font-medium mt-1">Free Delivery</p>
+                            )}
 
-                        <h3 className="font-bold mt-2">{item.title}</h3>
-                        <p>₹ {item.price}</p>
-                        <p>⭐ {item.rating}</p>
-
-                        {isProductInCart(item._id) ? (
-                            <button
-                                className="bg-red-500 text-white px-4 py-1 mt-2"
-                                onClick={() => removeFromCart(item._id)}
-                            >
-                                REMOVE
-                            </button>
-                        ) : (
-                            <button
-                                className="bg-blue-600 text-white px-4 py-1 mt-2"
-                                onClick={() => addToCart(item)}
-                            >
-                                ADD
-                            </button>
-                        )}
+                            {isProductInCart(item._id) ? (
+                                <button
+                                    className="w-full bg-orange-500 text-white py-2 rounded mt-2 font-medium hover:bg-orange-600"
+                                    onClick={() => removeFromCart(item._id)}
+                                >
+                                    REMOVE
+                                </button>
+                            ) : (
+                                <button
+                                    className="w-full bg-orange-500 text-white py-2 rounded mt-2 font-medium hover:bg-orange-600"
+                                    onClick={() => addToCart(item)}
+                                >
+                                    ADD TO CART
+                                </button>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
+            
+            {products.length === 0 && (
+                <div className="text-center py-12">
+                    <p className="text-gray-500 text-lg">No products found</p>
+                </div>
+            )}
 
             <Footer />
         </>

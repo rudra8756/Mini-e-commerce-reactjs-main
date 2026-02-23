@@ -1,47 +1,33 @@
-# E-Commerce App Fixes - COMPLETED ✅
+# E-Commerce Website Improvement TODO List
 
-## Summary of All Changes
+## Phase 1: Product Images & Data
+- [ ] 1.1 Update Product Model - Add reviews, multiple images fields
+- [ ] 1.2 Update Seed File - Add real multiple images for products
+- [ ] 1.3 Test Products display with real images
 
-### 1. Product Prices - FIXED ✅
-- Rewrote `seedProducts.js` with 200+ realistic products
-- 1000 products seeded with proper pricing
-- Category-based pricing:
-  - Groceries/Fruits/Vegetables: ₹10-500
-  - Snacks: ₹10-50
-  - Shoes: ₹800-12000
-  - Watches: ₹2000-500000
-  - Smartphones: ₹18000-120000
-  - Laptops: ₹45000-180000
+## Phase 2: Product Detail Page (Flipkart/Meesho style)
+- [ ] 2.1 Multiple product images gallery
+- [ ] 2.2 Product title, price, discount display
+- [ ] 2.3 Size/variant selection
+- [ ] 2.4 Add to cart functionality
+- [ ] 2.5 Reviews section
+- [ ] 2.6 Similar products section
 
-### 2. Product Model - UPDATED ✅
-- Added `discountedPrice` field to support discount pricing
+## Phase 3: Authentication
+- [ ] 3.1 Fix Login functionality
+- [ ] 3.2 Fix Register functionality  
+- [ ] 3.3 User session management
 
-### 3. Order System - ENHANCED ✅
-- Added shipping address fields (name, phone, street, city, state, zipCode, country)
-- Added estimated delivery date (3-7 days based on city)
-- Added order status timeline (placed → confirmed → processing → shipped → out_for_delivery → delivered)
-- Updated order controller with new fields
+## Phase 4: Payment System
+- [ ] 4.1 COD (Cash on Delivery) - working
+- [ ] 4.2 Card Payment integration
+- [ ] 4.3 UPI Payment integration
 
-### 4. Payment - FIXED ✅
-- Added Cash on Delivery (COD) as primary payment option
-- COD always works - no API keys needed
-- Online payment (Stripe) works if STRIPE_SECRET_KEY is set
+## Phase 5: Reviews & Messaging
+- [ ] 5.1 Add Review system
+- [ ] 5.2 Seller messaging system
 
-## Files Modified:
-1. `server/models/Product.js` - Added discountedPrice field
-2. `server/models/Order.js` - Enhanced with shipping, delivery, timeline
-3. `server/controllers/orderController.js` - Updated with new features
-4. `server/routes/order.js` - Added confirmPayment route
-5. `server/routes/payment.js` - Added COD payment option
-6. `server/seedProducts.js` - Complete rewrite with realistic prices
-
-## Testing Status:
-- ✅ Server running on port 5000
-- ✅ MongoDB Connected
-- ✅ 1000 products seeded successfully
-
-## Next Steps for User:
-1. Restart server to apply Product model changes
-2. Test in browser - products should show realistic prices
-3. Test order placement with COD
-4. Test order tracking
+## Phase 6: Final Testing & Polish
+- [ ] 6.1 Test complete user flow
+- [ ] 6.2 Fix bugs
+- [ ] 6.3 UI improvements
