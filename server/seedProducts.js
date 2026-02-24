@@ -350,14 +350,12 @@ const sampleProductsData = [
   { title: "Raisins 500g", category: "dry food", basePrice: 200 }
 ];
 
-// Generate fallback image
+// Generate SVG placeholder image
 const getFallbackImage = (title) => {
-  let hash = 0;
-  for (let i = 0; i < title.length; i++) {
-    hash = title.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const id = Math.abs(hash % 1000);
-  return `https://picsum.photos/seed/${id}/400/400`;
+  const firstLetter = title.charCodeAt(0) % 26;
+  const hue = (firstLetter * 13) % 360;
+  const encodedTitle = encodeURIComponent(title.substring(0, 15));
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect fill='hsl(${hue},60%,90%)' width='400' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-size='100'%3E📦%3C/text%3E%3Ctext x='50%25' y='70%25' dominant-baseline='middle' text-anchor='middle' font-size='18' fill='%23333'%3E${encodedTitle}%3C/text%3E%3C/svg%3E`;
 };
 
 // Get product images
