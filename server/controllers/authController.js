@@ -30,3 +30,4 @@ exports.login = async (req, res) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "default-secret-key");
   res.json({ token, user });
 };
+ 

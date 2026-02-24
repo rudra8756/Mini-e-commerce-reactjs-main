@@ -77,7 +77,8 @@ export default function Cart() {
             return;
         }
 
-        const userId = user?.uid || localStorage.getItem("USER_ID") || "guest";
+        // Use MongoDB _id for authenticated users, fallback to localStorage or guest
+        const userId = user?._id || localStorage.getItem("USER_ID") || "guest";
 
         const orderData = {
             shippingAddress: {
