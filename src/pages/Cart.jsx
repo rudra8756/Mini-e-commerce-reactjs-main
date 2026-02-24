@@ -35,7 +35,10 @@ export default function Cart() {
     const [processingPayment, setProcessingPayment] = useState(false)
 
     const refreshCart = () => {
-        const userId = user?._id || localStorage.getItem("USER_ID");
+        let userId = user?._id || localStorage.getItem("USER_ID");
+        if (!userId) {
+            userId = localStorage.getItem("GUEST_ID") || "guest";
+        }
         API.get(`/cart?userId=${userId}`).then(res => {
             setCartData(res.data);
             setcart(res.data.products || []);
@@ -484,13 +487,22 @@ export default function Cart() {
 }
 
 function CartRow({ data, discountApplied, discountPercentage, refreshCart }) {
-    let { setcart } = useContext(userContext)
+    let { setcart, user } = useContext(userContext)
     let { quantity } = data
     let [myqty, setqty] = useState(quantity)
 
+    const getUserId = () => {
+        let userId = user?._id || localStorage.getItem("USER_ID");
+        if (!userId) {
+            userId = localStorage.getItem("GUEST_ID") || "guest";
+        }
+        return userId;
+    };
+
     const removeFromCart = async () => {
         try {
-            await API.delete(`/cart/${data.product._id}`);
+            const userId = getUserId();
+            await API.delete(`/cart/${data.product._id}?userId=${userId}`);
             refreshCart();
             toast.success("Item removed from cart");
         } catch (error) {
@@ -500,7 +512,8 @@ function CartRow({ data, discountApplied, discountPercentage, refreshCart }) {
 
     const updateQuantity = async (newQty) => {
         try {
-            await API.put(`/cart/${data.product._id}`, { quantity: newQty });
+            const userId = getUserId();
+            await API.put(`/cart/${data.product._id}?userId=${userId}`, { quantity: newQty });
             refreshCart();
         } catch (error) {
             toast.error("Failed to update quantity");

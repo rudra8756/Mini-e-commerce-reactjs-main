@@ -48,12 +48,16 @@ export default function Home() {
 
   const addToCart = async (product) => {
     try {
-      const userId = user?._id || localStorage.getItem("USER_ID");
-      await API.post("/cart", {
-        productId: product._id,
-        quantity: 1,
-        userId: userId
-      });
+      let userId = user?._id || localStorage.getItem("USER_ID");
+      if (!userId) {
+        let guestId = localStorage.getItem("GUEST_ID");
+        if (!guestId) {
+          guestId = "guest_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+          localStorage.setItem("GUEST_ID", guestId);
+        }
+        userId = guestId;
+      }
+      await API.post("/cart", { productId: product._id, quantity: 1, userId: userId });
       setcart(prev => [...prev, { productId: product, quantity: 1 }]);
       toast.success("Added to cart");
     } catch (error) {
