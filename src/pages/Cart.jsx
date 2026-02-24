@@ -59,7 +59,7 @@ export default function Cart() {
     }
 
     const handleProceedToCheckout = () => {
-        navigate('/Checkout');
+        navigate('/checkout/address');
     }
 
     return (
