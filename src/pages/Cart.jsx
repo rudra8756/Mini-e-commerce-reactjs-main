@@ -253,7 +253,7 @@ export default function Cart() {
                                         onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4"
                                     />
-                                    <span className="text-sm">Cash on Delivery (COD)</span>
+                                    <span className="text-sm">💵 Cash on Delivery (COD)</span>
                                 </label>
                                 <label className="flex items-center space-x-2 cursor-pointer">
                                     <input 
@@ -264,7 +264,7 @@ export default function Cart() {
                                         onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4"
                                     />
-                                    <span className="text-sm">Credit/Debit Card</span>
+                                    <span className="text-sm">💳 Credit / Debit Card</span>
                                 </label>
                                 <label className="flex items-center space-x-2 cursor-pointer">
                                     <input 
@@ -275,9 +275,101 @@ export default function Cart() {
                                         onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4"
                                     />
-                                    <span className="text-sm">UPI</span>
+                                    <span className="text-sm">📱 UPI</span>
+                                </label>
+                                <label className="flex items-center space-x-2 cursor-pointer">
+                                    <input 
+                                        type="radio" 
+                                        name="payment" 
+                                        value="netbanking"
+                                        checked={paymentMethod === "netbanking"}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-sm">🏦 Net Banking</span>
                                 </label>
                             </div>
+
+                            {/* Payment Details Form */}
+                            {paymentMethod === "card" && (
+                                <div className="mt-4 p-4 bg-gray-100 rounded-lg space-y-3">
+                                    <h4 className="font-semibold text-sm">Card Details</h4>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Card Number (16 digits)"
+                                        className="w-full p-2 border text-sm rounded"
+                                        maxLength={16}
+                                    />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input 
+                                            type="text" 
+                                            placeholder="MM/YY"
+                                            className="w-full p-2 border text-sm rounded"
+                                            maxLength={5}
+                                        />
+                                        <input 
+                                            type="text" 
+                                            placeholder="CVV"
+                                            className="w-full p-2 border text-sm rounded"
+                                            maxLength={3}
+                                        />
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Name on Card"
+                                        className="w-full p-2 border text-sm rounded"
+                                    />
+                                    <p className="text-xs text-green-600">🔒 Secure payment via Stripe</p>
+                                </div>
+                            )}
+
+                            {paymentMethod === "upi" && (
+                                <div className="mt-4 p-4 bg-gray-100 rounded-lg space-y-3">
+                                    <h4 className="font-semibold text-sm">UPI Payment</h4>
+                                    <input 
+                                        type="text" 
+                                        placeholder="UPI ID (e.g., mobile@upi)"
+                                        className="w-full p-2 border text-sm rounded"
+                                    />
+                                    <p className="text-xs text-gray-500">Enter your UPI ID to pay via GPay, PhonePe, Paytm, etc.</p>
+                                    <div className="flex gap-2 mt-2">
+                                        <span className="px-2 py-1 bg-blue-100 rounded text-xs">📱 GPay</span>
+                                        <span className="px-2 py-1 bg-purple-100 rounded text-xs">📱 PhonePe</span>
+                                        <span className="px-2 py-1 bg-blue-500 text-white rounded text-xs">📱 Paytm</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {paymentMethod === "netbanking" && (
+                                <div className="mt-4 p-4 bg-gray-100 rounded-lg space-y-3">
+                                    <h4 className="font-semibold text-sm">Net Banking</h4>
+                                    <select className="w-full p-2 border text-sm rounded">
+                                        <option value="">Select Your Bank</option>
+                                        <option value="sbi">🏦 State Bank of India</option>
+                                        <option value="hdfc">🏦 HDFC Bank</option>
+                                        <option value="icici">🏦 ICICI Bank</option>
+                                        <option value="axis">🏦 Axis Bank</option>
+                                        <option value="kotak">🏦 Kotak Bank</option>
+                                        <option value="yes">🏦 Yes Bank</option>
+                                        <option value="pnb">🏦 Punjab National Bank</option>
+                                        <option value="bob">🏦 Bank of Baroda</option>
+                                        <option value="other">🏦 Other Banks</option>
+                                    </select>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Registered Mobile Number"
+                                        className="w-full p-2 border text-sm rounded"
+                                    />
+                                </div>
+                            )}
+
+                            {paymentMethod === "cod" && (
+                                <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                                    <p className="text-sm text-green-700">
+                                        ✅ Pay ₹{finalTotal.toFixed(2)} in cash when the order is delivered to your doorstep.
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         <div className="border-t mt-8">
