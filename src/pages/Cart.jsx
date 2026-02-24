@@ -22,6 +22,17 @@ export default function Cart() {
     })
     
     const [paymentMethod, setPaymentMethod] = useState("cod")
+    
+    // Payment details state
+    const [cardDetails, setCardDetails] = useState({
+        cardNumber: "",
+        expiry: "",
+        cvv: "",
+        nameOnCard: ""
+    })
+    const [upiId, setUpiId] = useState("")
+    const [selectedBank, setSelectedBank] = useState("")
+    const [processingPayment, setProcessingPayment] = useState(false)
 
     const refreshCart = () => {
         const userId = user?._id || localStorage.getItem("USER_ID");
@@ -66,6 +77,38 @@ export default function Cart() {
         }
     }
 
+    const validatePaymentDetails = () => {
+        if (paymentMethod === "card") {
+            if (!cardDetails.cardNumber || cardDetails.cardNumber.length < 16) {
+                toast.error("Please enter valid 16-digit card number");
+                return false;
+            }
+            if (!cardDetails.expiry || cardDetails.expiry.length < 5) {
+                toast.error("Please enter valid expiry date (MM/YY)");
+                return false;
+            }
+            if (!cardDetails.cvv || cardDetails.cvv.length < 3) {
+                toast.error("Please enter valid CVV");
+                return false;
+            }
+            if (!cardDetails.nameOnCard) {
+                toast.error("Please enter name on card");
+                return false;
+            }
+        } else if (paymentMethod === "upi") {
+            if (!upiId || !upiId.includes('@')) {
+                toast.error("Please enter valid UPI ID (e.g., mobile@upi)");
+                return false;
+            }
+        } else if (paymentMethod === "netbanking") {
+            if (!selectedBank) {
+                toast.error("Please select your bank");
+                return false;
+            }
+        }
+        return true;
+    }
+
     const handleCheckout = async () => {
         if (!shippingAddress.name || !shippingAddress.address || !shippingAddress.city || !shippingAddress.pincode || !shippingAddress.phone) {
             toast.error("Please fill in all address fields");
@@ -76,6 +119,31 @@ export default function Cart() {
             toast.error("Please enter a valid 10-digit phone number");
             return;
         }
+
+        // Validate payment details
+        if (!validatePaymentDetails()) {
+            return;
+        }
+
+        // Simulate payment processing
+        setProcessingPayment(true);
+        
+        // Show payment processing message
+        let paymentMessage = "";
+        if (paymentMethod === "card") {
+            paymentMessage = "Processing card payment...";
+        } else if (paymentMethod === "upi") {
+            paymentMessage = "Redirecting to UPI payment...";
+        } else if (paymentMethod === "netbanking") {
+            paymentMessage = "Redirecting to net banking...";
+        } else {
+            paymentMessage = "Processing order...";
+        }
+        
+        toast.info(paymentMessage);
+
+        // Simulate processing delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         // Use MongoDB _id for authenticated users, fallback to localStorage or guest
         const userId = user?._id || localStorage.getItem("USER_ID") || "guest";
@@ -91,12 +159,17 @@ export default function Cart() {
                 country: "India"
             },
             paymentMethod: paymentMethod,
+            paymentDetails: {
+                ...(paymentMethod === "card" && { last4: cardDetails.cardNumber.slice(-4) }),
+                ...(paymentMethod === "upi" && { upiId: upiId }),
+                ...(paymentMethod === "netbanking" && { bank: selectedBank })
+            },
             userId: userId
         };
 
         try {
             const response = await API.post("/orders", orderData);
-            toast.success("Order placed successfully!");
+            toast.success("Order placed successfully! Payment received.");
             
             setShippingAddress({
                 name: "",
@@ -107,10 +180,15 @@ export default function Cart() {
                 phone: ""
             });
             setPaymentMethod("cod");
+            setCardDetails({ cardNumber: "", expiry: "", cvv: "", nameOnCard: "" });
+            setUpiId("");
+            setSelectedBank("");
             
             refreshCart();
         } catch (error) {
             toast.error("Failed to place order: " + (error.response?.data?.message || error.message));
+        } finally {
+            setProcessingPayment(false);
         }
     }
 
@@ -290,7 +368,6 @@ export default function Cart() {
                                 </label>
                             </div>
 
-                            {/* Payment Details Form */}
                             {paymentMethod === "card" && (
                                 <div className="mt-4 p-4 bg-gray-100 rounded-lg space-y-3">
                                     <h4 className="font-semibold text-sm">Card Details</h4>
@@ -299,6 +376,8 @@ export default function Cart() {
                                         placeholder="Card Number (16 digits)"
                                         className="w-full p-2 border text-sm rounded"
                                         maxLength={16}
+                                        value={cardDetails.cardNumber}
+                                        onChange={(e) => setCardDetails({...cardDetails, cardNumber: e.target.value.replace(/\D/g, '')})}
                                     />
                                     <div className="grid grid-cols-2 gap-2">
                                         <input 
@@ -306,18 +385,24 @@ export default function Cart() {
                                             placeholder="MM/YY"
                                             className="w-full p-2 border text-sm rounded"
                                             maxLength={5}
+                                            value={cardDetails.expiry}
+                                            onChange={(e) => setCardDetails({...cardDetails, expiry: e.target.value})}
                                         />
                                         <input 
-                                            type="text" 
+                                            type="password" 
                                             placeholder="CVV"
                                             className="w-full p-2 border text-sm rounded"
                                             maxLength={3}
+                                            value={cardDetails.cvv}
+                                            onChange={(e) => setCardDetails({...cardDetails, cvv: e.target.value.replace(/\D/g, '')})}
                                         />
                                     </div>
                                     <input 
                                         type="text" 
                                         placeholder="Name on Card"
                                         className="w-full p-2 border text-sm rounded"
+                                        value={cardDetails.nameOnCard}
+                                        onChange={(e) => setCardDetails({...cardDetails, nameOnCard: e.target.value})}
                                     />
                                     <p className="text-xs text-green-600">🔒 Secure payment via Stripe</p>
                                 </div>
@@ -330,6 +415,8 @@ export default function Cart() {
                                         type="text" 
                                         placeholder="UPI ID (e.g., mobile@upi)"
                                         className="w-full p-2 border text-sm rounded"
+                                        value={upiId}
+                                        onChange={(e) => setUpiId(e.target.value)}
                                     />
                                     <p className="text-xs text-gray-500">Enter your UPI ID to pay via GPay, PhonePe, Paytm, etc.</p>
                                     <div className="flex gap-2 mt-2">
@@ -343,7 +430,11 @@ export default function Cart() {
                             {paymentMethod === "netbanking" && (
                                 <div className="mt-4 p-4 bg-gray-100 rounded-lg space-y-3">
                                     <h4 className="font-semibold text-sm">Net Banking</h4>
-                                    <select className="w-full p-2 border text-sm rounded">
+                                    <select 
+                                        className="w-full p-2 border text-sm rounded"
+                                        value={selectedBank}
+                                        onChange={(e) => setSelectedBank(e.target.value)}
+                                    >
                                         <option value="">Select Your Bank</option>
                                         <option value="sbi">🏦 State Bank of India</option>
                                         <option value="hdfc">🏦 HDFC Bank</option>
@@ -379,9 +470,10 @@ export default function Cart() {
                             </div>
                             <button
                                 onClick={handleCheckout}
-                                className="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full rounded cursor-pointer"
+                                disabled={processingPayment}
+                                className="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
                             >
-                                Place Order
+                                {processingPayment ? "Processing..." : "Place Order"}
                             </button>
                         </div>
                     </div>
